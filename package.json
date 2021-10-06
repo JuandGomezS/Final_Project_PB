@@ -1,0 +1,18 @@
+{
+  "type": "module",
+  "name": "clase-8",
+  "version": "1.0.0",
+  "main": "01-server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon server.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1",
+    "express-handlebars": "^5.3.3",
+    "nodemon": "^2.0.13",
+    "socket.io": "^4.2.0"
+  }
+}
