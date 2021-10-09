@@ -3,11 +3,12 @@ import fs from 'fs';
 import { isAdmin } from "../../server.js";
 import { Carrito } from "./carrito.model.js";
 
+
 const {pathname: root} = new URL('../', import.meta.url)
 const __dirname=root.substring(1);
 
 //*****************************VARIABLES************************************/
-let newId = 0;
+
 let dataPathProductos= __dirname + "data/productos.txt";
 let dataPathCarrito= __dirname + "data/carrito.txt";
 let productos=[];
@@ -29,7 +30,7 @@ const readData= (path)=>{
   }
 } 
 //**************************************************************************/
-
+const carritoF = new Carrito();
 let carrito=readData(dataPathCarrito);
 export const carritoRouter = Router();
 
@@ -63,7 +64,7 @@ carritoRouter
 
   //****************************AGREGAR************************************/
   .post("/agregar/:id", (req, res) => {
-    const carrito = new Carrito();
+   
     let carritot=readData(dataPathCarrito);
     let prods=[];
     carritot.productos?prods=carritot.productos:prods=[];
@@ -79,16 +80,14 @@ carritoRouter
     }
     productos=readData(dataPathProductos);
   
-    carrito.length > 0?newId = parseInt(carrito[carrito.length - 1].id + 1):newId = 1;
     const producto = productos.find((elemento) => elemento.id == idP);
     if(!producto){
         res.json({ Error: "Producto no encontrado", Response: "404"});
         return;
     }
     prods.push(producto);
-    carrito.id=newId;
-    carrito.productos=prods;
-    fs.writeFileSync(dataPathCarrito, JSON.stringify(carrito));
+    carritoF.productos=prods;
+    fs.writeFileSync(dataPathCarrito, JSON.stringify(carritoF));
     res.json({ response: "200 OK" });
   })
 

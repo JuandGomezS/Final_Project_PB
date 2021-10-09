@@ -1,1 +1,1 @@
-[]
+{"id":"03bbacdf-0cb1-4102-b1a5-39776b96a91b","timestamp":1633811021756,"productos":[{"id":1,"timestamp":1633810882498,"title":"JUAN","description":"csdfsdf","code":"3456","image":"http://image.com","price":"3000","stock":"109"},{"id":2,"timestamp":1633810889129,"title":"KATHE","description":"csdfsdf","code":"3456","image":"http://image.com","price":"3000","stock":"109"}]}
