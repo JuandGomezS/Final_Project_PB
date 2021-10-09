@@ -1,1 +1,1 @@
-[]
+{"id":1,"timestamp":1633810214271,"productos":[{"id":1,"timestamp":1633810013442,"title":"KATHE","description":"csdfsdf","code":"3456","image":"http://image.com","price":"3000","stock":"109"},{"id":2,"timestamp":1633810020934,"title":"JUAN","description":"csdfsdf","code":"3456","image":"http://image.com","price":"3000","stock":"109"}]}
