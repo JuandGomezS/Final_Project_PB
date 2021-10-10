@@ -47,7 +47,7 @@ productsRouter
 
   .post("/agregar", (req, res) => {
     if(!isAdmin){
-      const object={Error : -1, Descripcion: "Ruta /productos/agregar método POST no autorizada", response: "401 Unauthorized"}
+      const object={Error : -1, Descripcion: "Ruta /productos/agregar método POST no autorizada", Response: "401 Unauthorized"}
       res.status(401).send(object)
       return;
     }
@@ -75,7 +75,7 @@ productsRouter
 
   .put("/actualizar/:id", (req, res) => {
     if(!isAdmin){
-      const object={Error : -1, Descripcion: "Ruta /productos/agregar método POST no autorizada", response: "401 Unauthorized"}
+      const object={Error : -1, Descripcion: "Ruta /productos/agregar método POST no autorizada", Response: "401 Unauthorized"}
       res.status(401).send(object)
       return;
     }
@@ -108,7 +108,7 @@ productsRouter
 
   .delete("/borrar/:id", (req, res) => {
     if(!isAdmin){
-      const object={Error : -1, Descripcion: "Ruta /productos/agregar método POST no autorizada", response: "401 Unauthorized"}
+      const object={Error : -1, Descripcion: "Ruta /productos/agregar método POST no autorizada", Response: "401 Unauthorized"}
       res.status(401).send(object)
       return;
     }

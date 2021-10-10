@@ -68,7 +68,7 @@ carritoRouter
     let prods=[];
     carritot.productos?prods=carritot.productos:prods=[];
     if(!isAdmin){
-      const object={Error : -1, Descripcion: "Ruta /productos/agregar método POST no autorizada", response: "401 Unauthorized"}
+      const object={Error : -1, Descripcion: "Ruta /productos/agregar método POST no autorizada", Response: "401 Unauthorized"}
       res.status(401).send(object)
       return;
     }
@@ -93,7 +93,7 @@ carritoRouter
   .delete("/borrar/:id", (req, res) => {
     carrito=readData(dataPathCarrito);
     if(!isAdmin){
-      const object={Error : -1, Descripcion: "Ruta /productos/agregar método POST no autorizada", response: "401 Unauthorized"}
+      const object={Error : -1, Descripcion: "Ruta /productos/agregar método POST no autorizada", Response: "401 Unauthorized"}
       res.status(401).send(object)
       return;
     }
@@ -101,14 +101,14 @@ carritoRouter
     let id = params.id;
     let index = carrito.productos.findIndex((x) => x.id == id);
     if(index<0){
-      const object = { Error: "Producto no encontrado", response: "400 Bad request" };
+      const object = { Error: "Producto no encontrado", Response: "400 Bad request" };
       res.status(400).send(object);
       return;
     }
     carrito.productos.splice(index, 1);
     fs.writeFileSync(dataPathCarrito, JSON.stringify(carrito));
-    const succes = { description: "Producto eliminado", response: "200 OK" };
-    const object = { error: "Producto no encontrado", response: "400 Bad request"};
+    const succes = { Description: "Producto eliminado", Response: "200 OK" };
+    const object = { Error: "Producto no encontrado", Response: "400 Bad request"};
     index >= 0 ? res.json(succes):res.status(400).send(object);
 });
 //**************************************************************************/
