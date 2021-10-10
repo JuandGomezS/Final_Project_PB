@@ -39,12 +39,15 @@ carritoRouter
   //******************************LISTAR************************************/
   .get("/listar", (req, res) => {
     carrito=readData(dataPathCarrito);
-    const object = { error: "No hay productos cargados al carrito" };
     if(carrito.length == 0 || carrito.productos.length == 0){
-      res.json({ object, response: "400 Bad request"})
+      const object = { 
+        Error: "No hay productos cargados al carrito", 
+        Response: "400 Bad Request"
+      };
+      res.status(400).send(object)
     }
     else{
-      res.json( { carrito, response: "200 OK" } );
+      res.json( { carrito, Response: "200 OK" } );
     }
   })
 
@@ -53,13 +56,9 @@ carritoRouter
     carrito=readData(dataPathCarrito);
     let params = req.params;
     let id = params.id;
-    if(!id){
-        res.json({ Error: "Incomplete Params", response: "400 Bad request" });
-        return;
-    }
     const product = carrito.productos.find((elemento) => elemento.id == id);
-    const object = { error: "Producto no encontrado" };
-    res.json(product ? { product, response: "200 OK" } : { object, response: "400 Bad request"});
+    const object = { Error: "Producto no encontrado", Response: "400 Bad request"};
+    product? res.json({ product, Response: "200 OK" }):res.status(400).send(object);
   })
 
   //****************************AGREGAR************************************/
@@ -69,47 +68,48 @@ carritoRouter
     let prods=[];
     carritot.productos?prods=carritot.productos:prods=[];
     if(!isAdmin){
-      res.json({ error : -1, descripcion: "Ruta /carrito/agregar método POST no autorizada"})
+      const object={Error : -1, Descripcion: "Ruta /productos/agregar método POST no autorizada", response: "401 Unauthorized"}
+      res.status(401).send(object)
       return;
     }
     let params = req.params;
     let idP = params.id;
-    if(!idP){
-        res.json({ Error: "Incomplete Params or product doesn't exist", response: "400 Bad request" });
-        return;
-    }
+
     productos=readData(dataPathProductos);
   
     const producto = productos.find((elemento) => elemento.id == idP);
     if(!producto){
-        res.json({ Error: "Producto no encontrado", Response: "404"});
+      const object = { Error: "Producto no encontrado", Response: "400 Bad Request"};
+        res.status(400).send(object)
         return;
     }
     prods.push(producto);
     carritoF.productos=prods;
     fs.writeFileSync(dataPathCarrito, JSON.stringify(carritoF));
-    res.json({ response: "200 OK" });
+    res.json({ Description: "Producto agregado", Response: "200 OK" });
   })
 
   //******************************BORRAR************************************/
   .delete("/borrar/:id", (req, res) => {
     carrito=readData(dataPathCarrito);
     if(!isAdmin){
-      res.json({ error : -1, descripcion: "Ruta /carrito/borrar/id? método DELETE no autorizada"})
+      const object={Error : -1, Descripcion: "Ruta /productos/agregar método POST no autorizada", response: "401 Unauthorized"}
+      res.status(401).send(object)
       return;
     }
     let params = req.params;
     let id = params.id;
     let index = carrito.productos.findIndex((x) => x.id == id);
-    if(!id||index<0){
-        res.json({ Error: "Incomplete Params or product doesn't exist", response: "400 Bad request" });
-        return;
+    if(index<0){
+      const object = { Error: "Producto no encontrado", response: "400 Bad request" };
+      res.status(400).send(object);
+      return;
     }
     carrito.productos.splice(index, 1);
     fs.writeFileSync(dataPathCarrito, JSON.stringify(carrito));
-    const succes = { response: "Producto eliminado" };
-    const object = { error: "Producto no encontrado" };
-    res.json(index >= 0 ? { succes, response: "200 OK" } : { object, response: "400 Bad request" })
+    const succes = { description: "Producto eliminado", response: "200 OK" };
+    const object = { error: "Producto no encontrado", response: "400 Bad request"};
+    index >= 0 ? res.json(succes):res.status(400).send(object);
 });
 //**************************************************************************/
 

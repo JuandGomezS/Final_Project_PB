@@ -2,6 +2,7 @@ import { Router } from "express";
 import fs from 'fs';
 import { isAdmin } from "../../server.js";
 
+
 const {pathname: root} = new URL('../', import.meta.url)
 const __dirname=root.substring(1);
 
@@ -32,30 +33,28 @@ export const productsRouter = Router();
 //********************************ROUTES************************************/
 productsRouter
   .get("/listar", (req, res) => {
-    const object = { error: "no hay productos cargados" };
-    res.json(productos.length>0 ? { productos, response: "200 OK" } : { object, response: "400 Bad request"});
+    const object = { Error: "No hay productos cargados", Response:"400 Bad Request"};
+    productos.length>0 ? res.json({ productos, Response: "200 OK" }):res.status(400).send(object);
   })
 
   .get("/listar/:id", (req, res) => {
     let params = req.params;
     let id = params.id;
-    if(!id){
-      res.json({ Error: "Incomplete Params", response: "400 Bad request" });
-      return;
-    }
     const product = productos.find((elemento) => elemento.id == id);
-    const object = { error: "producto no encontrado" };
-    res.json(product ? { product, response: "200 OK" } : { object, response: "400 Bad request"});
+    const object = { Error: "Producto no encontrado", Response:"400 Bad Request"};
+    product ? res.json({ product, Response: "200 OK" }):res.status(400).send(object);
   })
 
   .post("/agregar", (req, res) => {
     if(!isAdmin){
-      res.json({ error : -1, descripcion: "ruta /productos/agregar método POST no autorizada"})
+      const object={Error : -1, Descripcion: "Ruta /productos/agregar método POST no autorizada", response: "401 Unauthorized"}
+      res.status(401).send(object)
       return;
     }
     let body = req.body;
     if(!body.title||!body.description||!body.code||!body.image||!body.price||!body.stock){
-      res.json({ Error: "Incomplete Request", response: "400 Bad request" });
+      const object={ Error: "Incomplete Request", Response: "406 NotAcceptable" }
+      res.status(406).send(object)
       return;
     }
     productos.length > 0?newId = parseInt(productos[productos.length - 1].id + 1):newId = 1;
@@ -71,20 +70,22 @@ productsRouter
     };
     productos.push(object);
     fs.writeFileSync(dataPath, JSON.stringify(productos));
-    res.json({ Description: "Producto agregado",response: "200 OK" });
+    res.json({ Description: "Producto agregado", Response: "200 OK" });
   })
 
   .put("/actualizar/:id", (req, res) => {
     if(!isAdmin){
-      res.json({ error : -1, descripcion: "ruta /productos/actualizar/id? método PUT no autorizada"})
+      const object={Error : -1, Descripcion: "Ruta /productos/agregar método POST no autorizada", response: "401 Unauthorized"}
+      res.status(401).send(object)
       return;
     }
     let params = req.params;
     let body = req.body;
     let id = parseInt(params.id);
     let index = productos.findIndex((x) => x.id == id);
-    if(!id||index<0){
-      res.json({ Error: "Incomplete Params", response: "400 Bad request" });
+    if(index<0){
+      const object={ Error: "Producto no encontrado", Response: "400 Bad Request" };
+      res.status(400).send(object)
       return;
     }
     if (index >= 0) {
@@ -100,30 +101,30 @@ productsRouter
       };
     }
     fs.writeFileSync(dataPath, JSON.stringify(productos));
-    const succes = { response: "Producto actualizado" };
-    const object = { error: "producto no encontrado" };
-    res.json(index >= 0 ? { succes, response: "200 OK" } : { object, response: "400 Bad request" })
+    const succes = { Description: "Producto actualizado", Response: "200 OK" };
+    const object = { Error: "Producto no encontrado", Response: "400 Bad request"};
+    index >= 0 ? res.json(succes):res.status(400).send(object);
   })
 
   .delete("/borrar/:id", (req, res) => {
     if(!isAdmin){
-      res.json({ error : -1, descripcion: "ruta /productos/borrar/id? método DELETE no autorizada"})
+      const object={Error : -1, Descripcion: "Ruta /productos/agregar método POST no autorizada", response: "401 Unauthorized"}
+      res.status(401).send(object)
       return;
     }
     let params = req.params;
     let id = params.id;
     let index = productos.findIndex((x) => x.id == id);
-    console.log(index)
-    console.log(id)
-    if(!id||index<0){
-      res.json({ Error: "Incomplete Params or product doesn't exist", response: "400 Bad request" });
+    if(index<0){
+      const object = { Error: "Producto no encontrado", Response: "400 Bad request" };
+      res.status(400).send(object);
       return;
     }
     productos.splice(index, 1);
     fs.writeFileSync(dataPath, JSON.stringify(productos));
-    const succes = { response: "Producto eliminado" };
-    const object = { error: "producto no encontrado" };
-    res.json(index >= 0 ? { succes, response: "200 OK" } : { object, response: "400 Bad request" })
+    const succes = { Description: "Producto eliminado", Response: "200 OK"};
+    const object = { Error: "Producto no encontrado", Response: "400 Bad request"};
+    index >= 0 ? res.json(succes):res.status(400).send(object);
 });
 //***************************************************************************/
 
