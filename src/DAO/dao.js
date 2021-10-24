@@ -2,6 +2,11 @@ import Knex from "knex";
 import fs from "fs";
 import mongoose from "mongoose";
 import {producto} from "./producto.mongo.js"
+import admin from "firebase-admin";
+import serviceAccount from "./service.firebase.js";
+
+
+
 
 const { pathname: root } = new URL("../", import.meta.url);
 const __dirname = root.substring(1);
@@ -33,6 +38,11 @@ export class DAO {
       useUnifiedTopology: true,
       serverSelectionTimeoutMS: 1000,
     };
+
+    this.firebaseOpt = {
+      credential: admin.credential.cert(serviceAccount),
+      databaseURL: "https://ecommerce-14b1d-firebaseio.com"
+    }
   }
 
   //**************CONNECTION METHOD********************/
@@ -101,10 +111,22 @@ export class DAO {
         }
       };
       return connectFS(dataPathProductos);
-    } else if (cs == 4){
+    } else if (cs == 4) {
       const URI = "'mongodb+srv://juanGomez:Juan.1604*@cluster0.dwkqc.mongodb.net/ecommerce?retryWrites=true&w=majority";
       await mongoose.connect(URI, this.mongoOpt);
       console.log("Conectado a la base de datos de Mongo...");
+    } else if (cs == 5) {
+      try {
+        admin.initializeApp({
+          credential: admin.credential.cert(serviceAccount),
+          databaseURL: "https://ecommerce-14b1d-firebaseio.com"
+        });
+        console.log('Conectado a Firebase');
+
+      } catch (error) {
+        console.log(error)
+      }
+      
     }
   }
   //************************************CRUD METHODS***********************************************/
@@ -141,6 +163,18 @@ export class DAO {
       return product;
     } else if (ps==4){
       return await producto.find({id:id},{__v: 0})
+    } else if (ps ==5){
+      const  db = admin.firestore();
+      const query = db.collection('productos');
+      const doc = query.doc(`${id}`);        
+      const item = await doc.get();
+      const response = [item.data()];
+      if (response[0]==undefined){
+        return []
+      }
+      else{
+        return response;
+      }
     }
   }
 
@@ -171,7 +205,23 @@ export class DAO {
       return readData(dataPathProductos);
     } else if (ps == 4){
       return await producto.find({}, { __v: 0})
+    } else if (ps == 5){
+      const  db = admin.firestore();
+      const query = db.collection('productos');
+      const querySnapshot = await query.get();
+      let docs = querySnapshot.docs;        
+      const response = docs.map(doc=>({
+          id: doc.id,
+          title: doc.data().title,
+          description: doc.data().description,
+          code: doc.data().code,
+          image: doc.data().image,
+          price: doc.data().price,
+          stock: doc.data().stock,
+      }));
+      return response;
     }
+
   }
 
   async deleteProduct(ps, id) {
@@ -228,6 +278,23 @@ export class DAO {
       } catch (error) {
           return false
       }
+    } else if (ps ==5) {
+      const db = admin.firestore();
+      const query = db.collection('productos');
+      const querySnapshot = await query.get();
+      let docs = querySnapshot.docs;        
+      const response = docs.map(doc=>({
+          id: doc.id,
+      }));
+      let index = response.findIndex((x) => x.id == id);
+      const doc = query.doc(`${id}`);        
+      await doc.delete();
+      if (index>-1){
+        return true
+      }
+      else{
+        return false
+      }     
     }
   }
 
@@ -316,6 +383,30 @@ export class DAO {
       } catch (error) {
           return false
       }
+    } else if (ps == 5) {
+      try {
+        const db = admin.firestore();
+        const query = db.collection('productos');
+        const querySnapshot = await query.get();
+        let docs = querySnapshot.docs;        
+        const response = docs.map(doc=>({
+          id: doc.id,
+        }));
+        let id=1;
+        let last= parseInt(response[response.length-1].id)
+        if(response.length>0){
+          id = last+1;
+        }
+        else{
+          id=id
+        }
+        let doc = query.doc(`${id}`);
+        await doc.create(data);
+        return true
+      } catch (error) {
+        console.log(error);
+        return false
+      }
     }
   }
 
@@ -324,7 +415,6 @@ export class DAO {
       console.log("No ha ingresado el método de persistencia.");
       return;
     }
-
     if (ps == 1) {
       try {
         const knex = Knex(this.MySQLopt);
@@ -382,8 +472,23 @@ export class DAO {
         await producto.updateOne({id:id}, data);
         return true
       } catch (error) {
-          return false
+        return false
       }
+    } else if (ps == 5) {
+      try {
+        const  db = admin.firestore();
+        const query = db.collection('productos');
+        const doc = query.doc(`${id}`);
+        await doc.update(data);        
+        return true
+      } catch (error) {
+        return false
+      }
+
     }
   }
+
+
+
+
 }
