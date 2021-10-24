@@ -1,1 +1,1 @@
-[{"id":1,"timestamp":1635007912959,"title":"Producto 3","description":"Producto 3","code":"35346","image":"asdf","price":"35234","stock":"12"},{"id":2,"timestamp":1635007945608,"title":"Producto 2","description":"Producto 3","code":"35346","image":"asdf","price":"35234","stock":"12"}]
+[]
