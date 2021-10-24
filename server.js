@@ -13,7 +13,7 @@ app.use(express.urlencoded({ extended: true }));
 
 let PORT = 8080;
 export let isAdmin=true;
-export let ps = 5;
+export let ps = 4;
 persistence.connect(ps)
 
 const server = http.listen(PORT, () => {

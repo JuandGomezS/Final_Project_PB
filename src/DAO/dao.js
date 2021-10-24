@@ -469,8 +469,9 @@ export class DAO {
       }
     } else if (ps == 4) {
       try {
-        await producto.updateOne({id:id}, data);
-        return true
+        let upt=await producto.updateOne({id:id}, data);
+        console.log(upt.modifiedCount)
+        return upt.modifiedCount>0
       } catch (error) {
         return false
       }
