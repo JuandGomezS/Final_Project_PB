@@ -1,44 +1,21 @@
 import { Router } from "express";
-import fs from 'fs';
-import { isAdmin } from "../../server.js";
-import { Carrito } from "./carrito.model.js";
+import {  ps } from "../../server.js";
+
+import {DAO} from "../DAO/dao.js"
 
 
-const {pathname: root} = new URL('../', import.meta.url)
-const __dirname=root.substring(1);
+
 
 //*****************************VARIABLES************************************/
-
-let dataPathProductos= __dirname + "data/productos.txt";
-let dataPathCarrito= __dirname + "data/carrito.txt";
-let productos=[];
-
-
+const persistence = new DAO()
 //**************************************************************************/
 
-//*************************READ DATA FUNCTION*******************************/
-const readData= (path)=>{
-  /* fs.writeFileSync(path, '[]');  */ //Activar sólo para vaciar el archivo carrito.txt
-  if (fs.existsSync(path)) {
-    try {
-      const data = fs.readFileSync(path, "utf8");
-      const json = JSON.parse(data);
-      return json;
-    } catch (e) {
-      console.log(e)
-    }
-  }
-} 
-//**************************************************************************/
-const carritoF = new Carrito();
-let carrito=readData(dataPathCarrito);
 export const carritoRouter = Router();
-
 //********************************ROUTES************************************/
 carritoRouter
   //******************************LISTAR************************************/
-  .get("/listar", (req, res) => {
-    carrito=readData(dataPathCarrito);
+  .get("/listar", async (req, res) => {
+    let carrito = await persistence.getCart(ps)
     if(carrito.length == 0 || carrito.productos.length == 0){
       const object = { 
         Error: "No hay productos cargados al carrito", 
@@ -52,64 +29,32 @@ carritoRouter
   })
 
   //******************************LISTAR ID*********************************/
-  .get("/listar/:id", (req, res) => {
-    carrito=readData(dataPathCarrito);
+  .get("/listar/:id", async (req, res) => {
     let params = req.params;
     let id = params.id;
-    const product = carrito.productos.find((elemento) => elemento.id == id);
+    let product = await persistence.getCartItem(ps,id);
     const object = { Error: "Producto no encontrado", Response: "400 Bad request"};
     product? res.json({ product, Response: "200 OK" }):res.status(400).send(object);
   })
 
   //****************************AGREGAR************************************/
-  .post("/agregar/:id", (req, res) => {
-   
-    let carritot=readData(dataPathCarrito);
-    let prods=[];
-    carritot.productos?prods=carritot.productos:prods=[];
-    if(!isAdmin){
-      const object={Error : -1, Descripcion: "Ruta /productos/agregar método POST no autorizada", Response: "401 Unauthorized"}
-      res.status(401).send(object)
-      return;
-    }
+  .post("/agregar/:id", async(req, res) => {
     let params = req.params;
-    let idP = params.id;
-
-    productos=readData(dataPathProductos);
-  
-    const producto = productos.find((elemento) => elemento.id == idP);
-    if(!producto){
-      const object = { Error: "Producto no encontrado", Response: "400 Bad Request"};
-        res.status(400).send(object)
-        return;
-    }
-    prods.push(producto);
-    carritoF.productos=prods;
-    fs.writeFileSync(dataPathCarrito, JSON.stringify(carritoF));
-    res.json({ Description: "Producto agregado", Response: "200 OK" });
+    let id = params.id;
+    let prodAdd= await persistence.insertToCart(ps,id);
+    const object = { Error: "Producto no encontrado", Response: "400 Bad request"};
+    prodAdd? res.json({Description: "Producto agregado", Response: "200 OK" }):res.status(400).send(object);
   })
 
   //******************************BORRAR************************************/
-  .delete("/borrar/:id", (req, res) => {
-    carrito=readData(dataPathCarrito);
-    if(!isAdmin){
-      const object={Error : -1, Descripcion: "Ruta /productos/agregar método POST no autorizada", Response: "401 Unauthorized"}
-      res.status(401).send(object)
-      return;
-    }
+  .delete("/borrar/:id", async (req, res) => { 
     let params = req.params;
     let id = params.id;
-    let index = carrito.productos.findIndex((x) => x.id == id);
-    if(index<0){
-      const object = { Error: "Producto no encontrado", Response: "400 Bad request" };
-      res.status(400).send(object);
-      return;
-    }
-    carrito.productos.splice(index, 1);
-    fs.writeFileSync(dataPathCarrito, JSON.stringify(carrito));
-    const succes = { Description: "Producto eliminado", Response: "200 OK" };
-    const object = { Error: "Producto no encontrado", Response: "400 Bad request"};
-    index >= 0 ? res.json(succes):res.status(400).send(object);
+    console.log(id)
+    let del=await persistence.deleteFromCart(ps,id)
+    const succes = { Description: "Producto eliminado.", Response: "200 OK" };
+    const object = { Error: "Producto no encontrado.", Response: "400 Bad request"};
+    del? res.json(succes):res.status(400).send(object);
 });
 //**************************************************************************/
 

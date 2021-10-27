@@ -13,7 +13,7 @@ app.use(express.urlencoded({ extended: true }));
 
 let PORT = 8080;
 export let isAdmin=true;
-export let ps = 4;
+export let ps = 3;
 persistence.connect(ps)
 
 const server = http.listen(PORT, () => {
@@ -29,5 +29,7 @@ app.use(express.static("./front"));
 app.use("/productos", productsRouter);
 app.use("/carrito", carritoRouter);
 //*******************************************
+
+
 
 

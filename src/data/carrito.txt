@@ -1,1 +1,1 @@
-[]
+{"id":"6022ffbf-c5f1-49e3-a728-5b5f34085f38","timestamp":1635297407279,"productos":[{"id":2,"timestamp":1635297003796,"title":"Producto 2","description":"Producto","code":"35346","image":"asdf","price":"35234","stock":"12"}]}

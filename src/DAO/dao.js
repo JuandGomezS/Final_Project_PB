@@ -4,9 +4,9 @@ import mongoose from "mongoose";
 import {producto} from "./producto.mongo.js"
 import admin from "firebase-admin";
 import serviceAccount from "./service.firebase.js";
+import {Carrito} from "../Routers/carrito.model.js"
 
-
-
+const carritoF = new Carrito();
 
 const { pathname: root } = new URL("../", import.meta.url);
 const __dirname = root.substring(1);
@@ -489,7 +489,156 @@ export class DAO {
     }
   }
 
+  async getCart (ps){
+    if (!ps) {
+      console.log("No ha ingresado el método de persistencia.");
+      return;
+    }
+    if(ps==1){   
+    }else if(ps == 2){
+    }else if(ps == 3){
+      console.log(ps)
+      const readData= (path)=>{
+        /* fs.writeFileSync(path, '[]');  */ //Activar sólo para vaciar el archivo carrito.txt
+        if (fs.existsSync(path)) {
+          try {
+            const data = fs.readFileSync(path, "utf8");
+            const json = JSON.parse(data);
+            return json;
+          } catch (e) {
+            console.log(e)
+          }
+        }
+      } 
+
+      let carrito=readData(dataPathCarrito);
+      if(carrito.length == 0 || carrito.productos.length == 0){
+        return []
+      }
+      else{
+        return carrito
+      }
+    }else if(ps == 4){
+      
+    }else if(ps == 5){
+      
+    }
+
+  }
+
+  async getCartItem(ps,id){
+    if (!ps||!id) {
+      console.log("No ha ingresado el método de persistencia o el id.");
+      return;
+    }
+    if(ps==1){
+    }else if(ps == 2){
+    }else if(ps == 3){
+      const readData= (path)=>{
+        /* fs.writeFileSync(path, '[]');  */ //Activar sólo para vaciar el archivo carrito.txt
+        if (fs.existsSync(path)) {
+          try {
+            const data = fs.readFileSync(path, "utf8");
+            const json = JSON.parse(data);
+            return json;
+          } catch (e) {
+            console.log(e)
+          }
+        }
+      } 
+
+      try {
+        let carrito=readData(dataPathCarrito);
+        const product = carrito.productos.find((elemento) => elemento.id == id);
+        return product
+      } catch (error) {
+        return false
+      }
+      
+    }else if(ps == 4){
+    }else if(ps == 5){
+    }
 
 
+  }
 
+  async insertToCart(ps, id){
+    if (!ps||!id) {
+      console.log("No ha ingresado el método de persistencia o id.");
+      return;
+    }
+    if(ps==1){
+    }else if(ps == 2){
+    }else if(ps == 3){
+      const readData= (path)=>{
+        /* fs.writeFileSync(path, '[]');  */ //Activar sólo para vaciar el archivo carrito.txt
+        if (fs.existsSync(path)) {
+          try {
+            const data = fs.readFileSync(path, "utf8");
+            const json = JSON.parse(data);
+            return json;
+          } catch (e) {
+            console.log(e)
+          }
+        }
+      } 
+
+      try {
+        let carritot=readData(dataPathCarrito);
+        let prods=[];
+        carritot.productos?prods=carritot.productos:prods=[];
+        let productos=readData(dataPathProductos);
+        const producto = productos.find((elemento) => elemento.id == id);
+        prods.push(producto);
+        carritoF.productos=prods;
+        fs.writeFileSync(dataPathCarrito, JSON.stringify(carritoF));
+        return true;
+      } catch (error) {
+        console.log(error)
+        return false
+      }
+    }else if(ps == 4){ 
+    }else if(ps == 5){
+    }
+  }
+
+  async deleteFromCart(ps,id){
+    if (!ps||!id) {
+      console.log("No ha ingresado el método de persistencia o id.");
+      return;
+    }
+    if(ps==1){
+    }else if(ps == 2){
+    }else if(ps == 3){
+      const readData= (path)=>{
+        /* fs.writeFileSync(path, '[]');  */ //Activar sólo para vaciar el archivo carrito.txt
+        if (fs.existsSync(path)) {
+          try {
+            const data = fs.readFileSync(path, "utf8");
+            const json = JSON.parse(data);
+            return json;
+          } catch (e) {
+            console.log(e)
+          }
+        }
+      } 
+      try {
+        let carrito=readData(dataPathCarrito);
+        let index = carrito.productos.findIndex((x) => x.id == id);
+        if (index<0){
+          return false; 
+        }
+        console.log(index)
+        carrito.productos.splice(index, 1);
+        fs.writeFileSync(dataPathCarrito, JSON.stringify(carrito));
+        return true
+      } catch (error) {
+        console.log(error)
+        return false
+      }
+  
+    }else if(ps == 4){
+    }else if(ps == 5){
+    }
+  }
 }
