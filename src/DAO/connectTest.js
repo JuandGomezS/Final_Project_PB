@@ -1,14 +1,14 @@
-import {DAO} from "./dao.js"
+import { DAO } from "./dao.js";
+import { carrito } from "./mongo.models.js";
 
-const persistence = new DAO()
+const persistence = new DAO();
 
-persistence.connect(3)
+persistence.connect(4);
 
-
-const imprimir = async ()=>{
-
-   console.log(await persistence.getCart(3)) 
-}
-
-imprimir()
-
+let prod = new carrito({
+  productos:[]
+});
+prod.save(function (err, prod) {
+  if (err) return console.error(err);
+  console.log(" Producto guardado.");
+});

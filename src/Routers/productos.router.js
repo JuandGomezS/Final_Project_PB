@@ -9,7 +9,38 @@ export const productsRouter = Router();
 //********************************ROUTES************************************/
 productsRouter
   .get("/listar", async (req, res) => {
+    let query = req.query;
+    const{title, code, stock_i, stock_f, price_i, price_f} = query
     let productos= await persistence.getProducts(ps);
+    console.log(productos)
+    let validator=true;
+    productos=productos.filter((elemento)=>{
+      if(title){
+        validator= elemento.title==title;
+        if(!validator){
+          return false;
+        }
+      }
+      if(code){
+        validator= elemento.code==code;
+        if(!validator){
+          return false;
+        }
+      }
+      if(stock_i && stock_f && stock_i<=stock_f){
+        validator= elemento.stock>=stock_i && elemento.stock<=stock_f
+        if(!validator){
+          return false;
+        }
+      }
+      if(price_i && price_f && price_i<=price_f){
+        validator= elemento.price>=price_i && elemento.price<=price_f
+        if(!validator){
+          return false;
+        }
+      }
+      return validator;
+    });    
     const object = { Error: "No hay productos cargados", Response:"400 Bad Request"};
     productos.length>0 ? res.json({ productos, Response: "200 OK" }):res.status(400).send(object);
   })
