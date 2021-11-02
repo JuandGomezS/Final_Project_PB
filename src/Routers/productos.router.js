@@ -12,7 +12,6 @@ productsRouter
     let query = req.query;
     const{title, code, stock_i, stock_f, price_i, price_f} = query
     let productos= await persistence.getProducts(ps);
-    console.log(productos)
     let validator=true;
     productos=productos.filter((elemento)=>{
       if(title){
